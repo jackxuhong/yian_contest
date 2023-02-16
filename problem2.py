@@ -11,6 +11,32 @@ VKXKXUWPW
 BJJXJHWPX
 """
 
+def test_word(data, word, row, col, row_dir, col_dir, color):
+    size = len(word)
+    rows = len(data)
+    cols = len(data[0])
+
+    if row_dir > 0 and row + size > rows:
+        return False
+    
+    if row_dir < 0 and row + 1 - size < 0:
+        return False
+
+    if col_dir > 0 and col + size > cols:
+        return False
+
+    if col_dir < 0 and col + 1 - size < 0:
+        return False
+    
+    for x in range(size):
+        if data[row + x * row_dir][col + x * col_dir] != word[x]:
+            return False
+
+    for x in range(size):
+        color[row + x * row_dir][col + x * col_dir] = 1
+
+    return True
+
 def search_word(input, word):
     data = []
     for row in input.split('\n'):
@@ -27,51 +53,13 @@ def search_word(input, word):
     for r in range(h):
         w = len(data[r])
         for c in range(w):
-            # Test W
-            if c <= w - x:
-                found = True
-                for l in range(x):
-                    if data[r][c + l] != word[l]:
-                        found = False
-                        break
-                if found:
-                    count += 1
-                    for l in range(x):
-                        color[r][c + l] = 1
-            # Test S
-            if r <= h - x:
-                found = True
-                for l in range(x):
-                    if data[r + l][c] != word[l]:
-                        found = False
-                        break
-                if found:
-                    count += 1
-                    for l in range(x):
-                        color[r + l][c] = 1
-            # Test E
-            if c + 1 >= x:
-                found = True
-                for l in range(x):
-                    if data[r][c - l] != word[l]:
-                        found = False
-                        break
-                if found:
-                    count += 1
-                    for l in range(x):
-                        color[r][c - l] = 1
-            # Test N
-            if r + 1 >= x:
-                found = True
-                for l in range(x):
-                    if data[r - l][c] != word[l]:
-                        found = False
-                        break
-                if found:
-                    count += 1
-                    for l in range(x):
-                        color[r - l][c] = 1
-
+            for col_dir in [-1, 0, 1]:
+                for row_dir in [-1, 0, 1]:
+                    if col_dir == 0 and row_dir == 0:
+                        continue
+                    else:
+                        if test_word(data, word, r, c, row_dir, col_dir, color):
+                            count += 1
     
     for r in range(h):
         for c in range(len(data[r])):
@@ -85,6 +73,7 @@ def search_word(input, word):
     return count
 
 
-found = search_word(input, "KGK")
-
-print("Found ", found, " occurrence(s)")
+print("--------------------")
+found = search_word(input, "JK")
+print("--------------------")
+print(f"Found {found} occurrence(s)")
